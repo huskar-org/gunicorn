@@ -774,6 +774,24 @@ class Reload(Setting):
         application code or the reload will not work as designed.
         '''
 
+class EnableReusePort(Setting):
+    name = "reuseport"
+    section = "Server Mechanics"
+    cli = ["--reuseport"]
+    validator = validate_bool
+    action = "store_true"
+    default = False
+    desc = """\
+        Use SO_REUSEPORT when creating port.
+
+        Only available for Linux above 3.9.
+
+        This will fundamentally change how sockets are created in gunicorn.
+        If set to true, gunicorn will no longer create sockets in master,
+        but they will be created in worker process.
+
+        This mechanism improves spreading work load to all workers.
+        """
 
 class Spew(Setting):
     name = "spew"

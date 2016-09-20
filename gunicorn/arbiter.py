@@ -127,7 +127,8 @@ class Arbiter(object):
 
         self.init_signals()
         if not self.LISTENERS:
-            self.LISTENERS = create_sockets(self.cfg, self.log)
+            if not self.cfg.reuseport:
+                self.LISTENERS = create_sockets(self.cfg, self.log)
 
         listeners_str = ",".join([str(l) for l in self.LISTENERS])
         self.log.debug("Arbiter booted")
@@ -504,6 +505,8 @@ class Arbiter(object):
             util._setproctitle("worker [%s]" % self.proc_name)
             self.log.info("Booting worker with pid: %s", worker_pid)
             self.cfg.post_fork(self, worker)
+            if self.cfg.reuseport:
+                worker.sockets = create_sockets(self.cfg, self.log)
             worker.init_process()
             sys.exit(0)
         except SystemExit:
