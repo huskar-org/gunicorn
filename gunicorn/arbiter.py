@@ -130,9 +130,10 @@ class Arbiter(object):
             if not self.cfg.reuseport:
                 self.LISTENERS = create_sockets(self.cfg, self.log)
 
-        listeners_str = ",".join([str(l) for l in self.LISTENERS])
         self.log.debug("Arbiter booted")
-        self.log.info("Listening at: %s (%s)", listeners_str, self.pid)
+        if not self.cfg.reuseport:
+            listeners_str = ",".join([str(l) for l in self.LISTENERS])
+            self.log.info("Listening at: %s (%s)", listeners_str, self.pid)
         self.log.info("Using worker: %s", self.cfg.worker_class_str)
 
         # check worker class requirements
@@ -507,6 +508,10 @@ class Arbiter(object):
             self.cfg.post_fork(self, worker)
             if self.cfg.reuseport:
                 worker.sockets = create_sockets(self.cfg, self.log)
+                listeners_str = ",".join([str(l) for l in worker.sockets])
+                self.log.info("Listening at: %s (%s) using reuseport",
+                              listeners_str,
+                              worker_pid)
             worker.init_process()
             sys.exit(0)
         except SystemExit:
