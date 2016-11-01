@@ -780,7 +780,7 @@ class EnableReusePort(Setting):
     cli = ["--reuseport"]
     validator = validate_bool
     action = "store_true"
-    default = False
+    default = True
     desc = """\
         Use SO_REUSEPORT when creating port.
 
