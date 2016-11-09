@@ -505,13 +505,13 @@ class Arbiter(object):
         try:
             util._setproctitle("worker [%s]" % self.proc_name)
             self.log.info("Booting worker with pid: %s", worker_pid)
-            self.cfg.post_fork(self, worker)
             if self.cfg.reuseport:
                 worker.sockets = create_sockets(self.cfg, self.log)
                 listeners_str = ",".join([str(l) for l in worker.sockets])
                 self.log.info("Listening at: %s (%s) using reuseport",
                               listeners_str,
                               worker_pid)
+            self.cfg.post_fork(self, worker)
             worker.init_process()
             sys.exit(0)
         except SystemExit:
