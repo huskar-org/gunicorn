@@ -1423,6 +1423,26 @@ class Postfork(Setting):
         """
 
 
+class PostforkWhenReuseport(Setting):
+    name = "post_fork_when_reuseport"
+    section = "Server Hooks"
+    validator = validate_callable(2)
+    type = six.callable
+
+    def post_fork_when_reuseport(server, worker):
+        pass
+    default = staticmethod(post_fork_when_reuseport)
+    desc = """\
+        Only called just after a worker has been forked when using reuseport.
+
+        The difference between it and post_fork is that it's called before
+        establishing listening sockets.
+
+        The callable needs to accept two instance variables for the Arbiter and
+        new Worker.
+        """
+
+
 class PostWorkerInit(Setting):
     name = "post_worker_init"
     section = "Server Hooks"
