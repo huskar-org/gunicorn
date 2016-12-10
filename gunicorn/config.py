@@ -1600,6 +1600,22 @@ class OnExit(Setting):
         """
 
 
+class OnSignal(Setting):
+    name = "on_signal"
+    section = "Server Hooks"
+    validator = validate_callable(2)
+
+    def on_signal(self, sig):
+        pass
+
+    default = staticmethod(on_signal)
+    desc = """\
+        Called just after master received a signal and before the handler.
+
+        The callable needs to accept a single instance variable for the Arbiter.
+        """
+
+
 class ProxyProtocol(Setting):
     name = "proxy_protocol"
     section = "Server Mechanics"
