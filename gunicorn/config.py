@@ -1608,7 +1608,7 @@ class OnSignal(Setting):
     def on_signal(self, sig):
         pass
 
-    default = staticmethod(on_signal)
+    default = classmethod(on_signal)
     desc = """\
         Called just after master received a signal and before the handler.
 
