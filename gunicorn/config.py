@@ -1603,12 +1603,12 @@ class OnExit(Setting):
 class OnSignal(Setting):
     name = "on_signal"
     section = "Server Hooks"
-    validator = validate_callable(2)
+    validator = validate_callable(-1)
 
-    def on_signal(self, sig):
+    def on_signal(server, sig):
         pass
 
-    default = classmethod(on_signal)
+    default = staticmethod(on_signal)
     desc = """\
         Called just after master received a signal and before the handler.
 
