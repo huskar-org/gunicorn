@@ -399,6 +399,16 @@ def validate_group(val):
             raise ConfigError("No such group: '%s'" % val)
 
 
+def validate_on_signal(val):
+    val = validate_callable(-1)(val)
+
+    largs = len(inspect.getargspec(val)[0])
+    if largs == 2 or largs == 3:
+        return val
+    else:
+        raise TypeError("Value must have an arity of: 2")
+
+
 def validate_post_request(val):
     val = validate_callable(-1)(val)
 
@@ -1603,7 +1613,7 @@ class OnExit(Setting):
 class OnSignal(Setting):
     name = "on_signal"
     section = "Server Hooks"
-    validator = validate_callable(-1)
+    validator = validate_on_signal
 
     def on_signal(server, sig):
         pass
