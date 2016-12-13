@@ -192,6 +192,7 @@ class Arbiter(object):
                 if not handler:
                     self.log.error("Unhandled signal: %s", signame)
                     continue
+                self.cfg.on_signal(self, sig)
                 self.log.info("Handling signal: %s", signame)
                 handler()
                 self.wakeup()
