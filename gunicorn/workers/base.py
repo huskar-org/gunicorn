@@ -21,6 +21,7 @@ from gunicorn.http.errors import (
 from gunicorn.http.errors import InvalidProxyLine, ForbiddenProxyRequest
 from gunicorn.http.wsgi import default_environ, Response
 from gunicorn.six import MAXSIZE
+from gunicorn.sock import create_sockets
 
 
 class Worker(object):
@@ -107,21 +108,31 @@ class Worker(object):
             util.set_non_blocking(p)
             util.close_on_exec(p)
 
-        # Prevent fd inheritance
-        [util.close_on_exec(s) for s in self.sockets]
-        util.close_on_exec(self.tmp.fileno())
-
         self.log.close_on_exec()
 
         self.init_signals()
 
         self.wsgi = self.app.wsgi()
 
+        self._create_sockets()
+
+        # Prevent fd inheritance
+        [util.close_on_exec(s) for s in self.sockets]
+        util.close_on_exec(self.tmp.fileno())
+
         self.cfg.post_worker_init(self)
 
         # Enter main run loop
         self.booted = True
         self.run()
+
+    def _create_sockets(self):
+        """We change it after load app before start TCP server"""
+        pid = os.getpid()
+        self.sockets = create_sockets(self.cfg, self.log)
+        listeners_str = ",".join([str(l) for l in self.sockets])
+        self.log.info("Listening at: %s (%s) using reuseport",
+                      listeners_str, pid)
 
     def init_signals(self):
         # reset signaling
