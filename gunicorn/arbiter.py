@@ -60,6 +60,7 @@ class Arbiter(object):
         self.pidfile = None
         self.worker_age = 0
         self.reexec_pid = 0
+        self.reaped_worker_count = 0
         self.master_name = "Master"
 
         cwd = util.getcwd()
@@ -459,10 +460,21 @@ class Arbiter(object):
                     exitcode = status >> 8
                     if exitcode == self.WORKER_BOOT_ERROR:
                         reason = "Worker failed to boot."
-                        raise HaltServer(reason, self.WORKER_BOOT_ERROR)
+                        self.reaped_worker_count += 1
+                        if self.cfg.kill_master_when_one_third_workers_fail_to_load:
+                            if self.reaped_worker_count > self.num_workers / 3:
+                                raise HaltServer(reason, self.WORKER_BOOT_ERROR)
+                        else:
+                            raise HaltServer(reason, self.WORKER_BOOT_ERROR)
+
                     if exitcode == self.APP_LOAD_ERROR:
                         reason = "App failed to load."
-                        raise HaltServer(reason, self.APP_LOAD_ERROR)
+                        self.reaped_worker_count += 1
+                        if self.cfg.kill_master_when_one_third_workers_fail_to_load:
+                            if self.reaped_worker_count > self.num_workers / 3:
+                                raise HaltServer(reason, self.APP_LOAD_ERROR)
+                        else:
+                            raise HaltServer(reason, self.APP_LOAD_ERROR)
                     worker = self.WORKERS.pop(wpid, None)
                     if not worker:
                         continue

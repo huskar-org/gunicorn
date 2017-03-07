@@ -1732,6 +1732,17 @@ class SuppressRaggedEOFs(Setting):
     Suppress ragged EOFs (see stdlib ssl module's)
     """
 
+class KillMasterWhenOneThirdWorkersFailToLoad(Setting):
+    name = "kill_master_when_one_third_workers_fail_to_load"
+    section = "Server Mechanics"
+    cli = ["--kill-master-when-one-third-workers-fail-to-load"]
+    action = "store_true"
+    default = False
+    validator = validate_bool
+    desc = """\
+    Only quit master when one third of workers have failed to load
+    """
+
 class DoHandshakeOnConnect(Setting):
     name = "do_handshake_on_connect"
     section = "Ssl"
