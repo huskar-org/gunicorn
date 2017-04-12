@@ -114,7 +114,8 @@ class Worker(object):
 
         self.wsgi = self.app.wsgi()
 
-        self._create_sockets()
+        if self.cfg.reuseport:
+            self._create_sockets()
 
         # Prevent fd inheritance
         [util.close_on_exec(s) for s in self.sockets]
